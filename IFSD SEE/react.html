@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>CRUD Application</title>
+    <script src="https://unpkg.com/react/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // Define a component for creating, updating, reading, and deleting team player scores
+      class CRUDApp extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            scores: [],
+            newScore: 0,
+            editingIndex: -1,
+          };
+        }
+
+        handleInputChange = (event) => {
+          this.setState({ newScore: parseInt(event.target.value) });
+        };
+
+        addScore = () => {
+          const { scores, newScore } = this.state;
+          const updatedScores = [...scores, newScore];
+          this.setState({ scores: updatedScores, newScore: 0 });
+        };
+
+        editScore = (index) => {
+          const { scores } = this.state;
+          const editingScore = scores[index];
+          this.setState({ newScore: editingScore, editingIndex: index });
+        };
+
+        updateScore = () => {
+          const { scores, newScore, editingIndex } = this.state;
+          const updatedScores = [...scores];
+          updatedScores[editingIndex] = newScore;
+          this.setState({ scores: updatedScores, newScore: 0, editingIndex: -1 });
+        };
+
+        deleteScore = (index) => {
+          const { scores } = this.state;
+          const updatedScores = [...scores];
+          updatedScores.splice(index, 1);
+          this.setState({ scores: updatedScores });
+        };
+
+        calculateAverageScore = () => {
+          const { scores } = this.state;
+          let sum = 0;
+          for (const score of scores) {
+            sum += score;
+          }
+          return sum / scores.length;
+        };
+
+        calculateMinimumScore = () => {
+          const { scores } = this.state;
+          return Math.min(...scores);
+        };
+
+        calculateMaximumScore = () => {
+          const { scores } = this.state;
+          return Math.max(...scores);
+        };
+
+        render() {
+          const { scores, newScore, editingIndex } = this.state;
+
+          return (
+            <div>
+              <h2>Team Player Scores</h2>
+
+              <div>
+                <label>Score:</label>
+                <input
+                  type="number"
+                  value={newScore}
+                  onChange={this.handleInputChange}
+                />
+              </div>
+
+              {editingIndex === -1 ? (
+                <button onClick={this.addScore}>Add Score</button>
+              ) : (
+                <div>
+                  <button onClick={this.updateScore}>Update Score</button>
+                  <button onClick={() => this.setState({ editingIndex: -1, newScore: 0 })}>Cancel</button>
+                </div>
+              )}
+
+              <ul>
+                {scores.map((score, index) => (
+                  <li key={index}>
+                    {score}
+                    <button onClick={() => this.editScore(index)}>Edit</button>
+                    <button onClick={() => this.deleteScore(index)}>Delete</button>
+                  </li>
+                ))}
+              </ul>
+
+              <p>Average Score: {this.calculateAverageScore()}</p>
+              <p>Minimum Score: {this.calculateMinimumScore()}</p>
+              <p>Maximum Score: {this.calculateMaximumScore()}</p>
+            </div>
+          );
+        }
+      }
+
+      // Render the CRUDApp component to the DOM
+      ReactDOM.render(<CRUDApp />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
